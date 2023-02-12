@@ -4,7 +4,7 @@ FROM node:19
 
 WORKDIR /mesh
 
-# always have a lockfile (instead of multiple "yarn add"s) when building in a dockerfile,
+# always have a lockfile (instead of multiple "yarn add"s) when building in a dockerfile, making sure you're builds are reproducable and consistant
 COPY package.json yarn.lock ./
 RUN yarn --frozen-lockfile
 

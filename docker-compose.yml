@@ -37,8 +37,6 @@ services:
       - .docker/server:/data/server
     networks:
       - local
-    ports:
-      - 1337:1337
 
   mesh:
     build:
