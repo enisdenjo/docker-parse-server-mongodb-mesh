@@ -1,0 +1,61 @@
+# as long as all services in the same network, you dont need the "links" property
+networks:
+  local:
+    driver: bridge
+
+services:
+  database:
+    image: mongo:6.0.4
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      # prefer relative folders (instead of $HOME) when mounting to avoid polluting other devs home directories
+      - .docker/database:/data/db
+    networks:
+      - local
+
+  server:
+    image: parseplatform/parse-server:5.4.1
+    # depends_on is useful for ordered startup
+    # NOTE: depends_on will NOT automatically wait for a healthy status, just for the service to start
+    # read more: https://docs.docker.com/compose/startup-order/
+    depends_on:
+      - database
+    # prefer restarting only when failing to avoid restarts with clean exits
+    restart: on-failure
+    environment:
+      - PARSE_SERVER_APPLICATION_ID=$SERVER_APPLICATION_ID
+      - PARSE_SERVER_APPLICATION_NAME=$SERVER_APPLICATION_NAME
+      - PARSE_SERVER_MASTER_KEY=$SERVER_MASTER_KEY
+      - PARSE_SERVER_DATABASE_URI=mongodb://admin:admin@database/parse_server?authSource=admin
+      # TODO: substitue with a working parse server url
+      # - PARSE_SERVER_URL=http://10.0.2.2:1337/parse
+      - PARSE_SERVER_MOUNT_GRAPHQL=true
+    volumes:
+      # prefer relative folders (instead of $HOME) when mounting to avoid polluting other devs home directories
+      - .docker/server:/data/server
+    networks:
+      - local
+    ports:
+      - 1337:1337
+
+  mesh:
+    build:
+      context: mesh
+    # depends_on is useful for ordered startup
+    # NOTE: depends_on will NOT automatically wait for a healthy status, just for the service to start
+    # read more: https://docs.docker.com/compose/startup-order/
+    depends_on:
+      - server
+    # prefer restarting only when failing to avoid restarts with clean exits
+    restart: on-failure
+    environment:
+      - SERVER_HOST=server
+      - SERVER_APPLICATION_ID=$SERVER_APPLICATION_ID
+      - SERVER_APPLICATION_NAME=$SERVER_APPLICATION_NAME
+      - SERVER_MASTER_KEY=$SERVER_MASTER_KEY
+    networks:
+      - local
+    ports:
+      - 4000:4000

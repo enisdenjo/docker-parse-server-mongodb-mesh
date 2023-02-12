@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "name": "mesh",
+  "dependencies": {
+    "@envelop/auth0": "^4.0.4",
+    "@graphql-mesh/cli": "^0.82.14",
+    "@graphql-mesh/graphql": "^0.34.0",
+    "@graphql-mesh/runtime": "^0.46.7",
+    "graphql": "^16.6.0"
+  }
+}

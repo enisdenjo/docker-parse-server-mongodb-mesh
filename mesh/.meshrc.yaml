@@ -1,0 +1,16 @@
+sources:
+  - name: ParseServer
+    handler:
+      graphql:
+        endpoint: http://${SERVER_HOST}:1337/graphql
+        # for introspection
+        schemaHeaders:
+          X-Parse-Application-Id: ${SERVER_APPLICATION_ID}
+          X-Parse-Master-Key: ${SERVER_MASTER_KEY}
+        # for executing operations
+        operationHeaders:
+          X-Parse-Application-Id: ${SERVER_APPLICATION_ID}
+          X-Parse-Master-Key: ${SERVER_MASTER_KEY}
+
+serve:
+  playground: true
